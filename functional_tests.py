@@ -12,6 +12,14 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.browser.quit()
     
+    def check_for_row_in_list_table(self, row_text: str):
+        """
+        Asserts presence of row int table.
+        """
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         """User can start new list and retrive later again."""
         # Amber heard about new cool app with to-do lists
@@ -38,13 +46,8 @@ class NewVisitorTest(unittest.TestCase):
         # the page contains "1: Buy Peacock Feathers" as a list item
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows],
-            "New element did not appeared in table. "
-            f"Table content: {table.text}"
-        )
 
         # The text field still invites her to add another element.
         # She introduces "Make a fly out of peacock feathers"
@@ -55,10 +58,8 @@ class NewVisitorTest(unittest.TestCase):
         time.sleep(1)
 
         # The page is updated again, and now shows both elements of its list
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
-        self.assertIn('2: Make a fly out of peacock feathers', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.check_for_row_in_list_table('2: Make a fly out of peacock feathers')
 
         # Edith wonders if the site will remember her list. Next, she
         # sees that the site has generated a unique URL for her – about this
